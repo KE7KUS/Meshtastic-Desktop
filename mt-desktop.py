@@ -12,7 +12,6 @@ from PySide6.QtWidgets import (
   QMainWindow,
   QMenu,
   QMenuBar,
-  QVBoxLayout,
   QWidget
 )
 
@@ -26,38 +25,40 @@ class MainWindow(QMainWindow):
     self.setWindowTitle("Meshtastic Desktop")
     self._createActions() 
     self._createMenuBar()
+    self._createStatusBar()
 
   def _createActions(self):
     """Define menu actions for the application."""
-    self.newAction = QAction(self)
-    self.newAction.setText("&New")
+    self.newAction = QAction(QIcon("./icons/document.png"), "&New", self)
     self.newAction.setShortcut(QKeySequence.New)
 
-    self.openAction = QAction("&Open...", self)
+    self.openAction = QAction(QIcon("./icons/blue-folder-open-document-text.png"), "&Open...", self)
     self.openAction.setShortcut(QKeySequence.Open)
 
-    self.saveAction = QAction("&Save", self)
+    self.saveAction = QAction(QIcon("./icons/disk.png"), "&Save", self)
     self.saveAction.setShortcut(QKeySequence.Save)
 
-    self.saveAsAction = QAction("Save As...", self)
+    self.saveAsAction = QAction(QIcon("./icons/disks.png"), "Save As...", self)
     self.saveAsAction.setShortcut(QKeySequence.SaveAs)
 
-    self.exitAction = QAction("&Quit", self)
+    self.exitAction = QAction(QIcon("./icons/cross.png"), "&Quit", self)
     self.exitAction.setShortcut(QKeySequence.Quit)
 
-    self.cutAction = QAction("C&ut", self)
+    self.cutAction = QAction(QIcon("./icons/scissors.png"), "C&ut", self)
     self.cutAction.setShortcut(QKeySequence.Cut)
 
-    self.copyAction = QAction("&Copy", self)
+    self.copyAction = QAction(QIcon("./icons/blue-document-copy.png"), "&Copy", self)
     self.copyAction.setShortcut(QKeySequence.Copy)
 
-    self.pasteAction = QAction("&Paste", self)
+    self.pasteAction = QAction(QIcon("./icons/application--plus.png"), "&Paste", self)
     self.pasteAction.setShortcut(QKeySequence.Paste)
 
-    self.helpContentAction = QAction("&Help...", self)
+    self.radioConfigAction = QAction(QIcon("./icons/wrench.png"), "&Radio Configuration...", self)
+
+    self.helpContentAction = QAction(QIcon("./icons/lifebuoy.png"), "&Help...", self)
     self.helpContentAction.setShortcut(QKeySequence.HelpContents)
 
-    self.aboutAction = QAction("&About...", self)
+    self.aboutAction = QAction(QIcon("./icons/question.png"), "&About...", self)
 
   def _createMenuBar(self):
     """Constructs the application main menu bar."""
@@ -70,6 +71,7 @@ class MainWindow(QMainWindow):
     fileMenu.addAction(self.openAction)
     fileMenu.addAction(self.saveAction)
     fileMenu.addAction(self.saveAsAction)
+    fileMenu.addSeparator()
     fileMenu.addAction(self.exitAction)
 
     # Edit Menu
@@ -77,11 +79,16 @@ class MainWindow(QMainWindow):
     editMenu.addAction(self.cutAction)
     editMenu.addAction(self.copyAction)
     editMenu.addAction(self.pasteAction)
+    editMenu.addSeparator()
+    editMenu.addAction(self.radioConfigAction)
 
     # Help Menu
     helpMenu = menuBar.addMenu("&Help")
     helpMenu.addAction(self.helpContentAction)
-    helpMenu.addAction(self.aboutAction) 
+    helpMenu.addAction(self.aboutAction)
+
+  def _createStatusBar(self):
+    self.statusbar = self.statusBar()
 
 def setupSerialInterface():
   if platform.system() == 'Windows':
