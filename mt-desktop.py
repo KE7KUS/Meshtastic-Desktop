@@ -6,7 +6,7 @@
 
 import meshtastic, platform, sys
 from PySide6.QtCore import Qt, Slot, QUrl
-from PySide6.QtGui import QAction, QIcon, QKeySequence
+from PySide6.QtGui import QAction, QIcon, QKeySequence, QTextEdit
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (
   QApplication,
@@ -32,6 +32,8 @@ class MainWindow(QMainWindow):
 
   def _createActions(self):
     """Define menu actions for the application."""
+    edit = QTextEdit(self)
+    
     self.newAction = QAction(QIcon("./icons/document.png"), "&New", self)
     self.newAction.setShortcut(QKeySequence.New)
 
@@ -46,16 +48,19 @@ class MainWindow(QMainWindow):
 
     self.exitAction = QAction(QIcon("./icons/cross.png"), "&Quit", self)
     self.exitAction.setShortcut(QKeySequence.Quit)
-    self.exitAction.triggered.connect(self.exitProgram)
+    self.exitAction.triggered.connect(QtGui.qApp.quit)
 
     self.cutAction = QAction(QIcon("./icons/scissors.png"), "C&ut", self)
     self.cutAction.setShortcut(QKeySequence.Cut)
+    self.cutAction.triggered.connect(edit.cut)
 
     self.copyAction = QAction(QIcon("./icons/blue-document-copy.png"), "&Copy", self)
     self.copyAction.setShortcut(QKeySequence.Copy)
+    self.copyAction.triggered.connect(edit.copy)
 
     self.pasteAction = QAction(QIcon("./icons/application--plus.png"), "&Paste", self)
     self.pasteAction.setShortcut(QKeySequence.Paste)
+    self.pasteAction.triggered.connect(edit.paste)
 
     self.radioConfigAction = QAction(QIcon("./icons/wrench.png"), "&Radio Configuration...", self)
 
@@ -65,8 +70,6 @@ class MainWindow(QMainWindow):
     self.aboutAction = QAction(QIcon("./icons/question.png"), "&About...", self)
 
   # -----GUI Methods-----#
-  def exitProgram(self):
-    quit()
 
   def _createMenuBar(self):
     """Constructs the application main menu bar."""
