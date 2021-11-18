@@ -46,6 +46,7 @@ class MainWindow(QMainWindow):
 
     self.exitAction = QAction(QIcon("./icons/cross.png"), "&Quit", self)
     self.exitAction.setShortcut(QKeySequence.Quit)
+    self.exitAction.triggered.connect(self.exitProgram)
 
     self.cutAction = QAction(QIcon("./icons/scissors.png"), "C&ut", self)
     self.cutAction.setShortcut(QKeySequence.Cut)
@@ -62,6 +63,10 @@ class MainWindow(QMainWindow):
     self.helpContentAction.setShortcut(QKeySequence.HelpContents)
 
     self.aboutAction = QAction(QIcon("./icons/question.png"), "&About...", self)
+
+  # -----GUI Methods-----#
+  def exitProgram(self):
+    quit()
 
   def _createMenuBar(self):
     """Constructs the application main menu bar."""
