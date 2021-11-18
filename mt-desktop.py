@@ -6,7 +6,7 @@
 
 import meshtastic, platform, sys
 from PySide6.QtCore import Qt, Slot
-from PySide6.QtGui import QAction, QIcon, QKeySequence
+from PySide6.QtGui import QAction, QIcon, QKeySequence, QTabWidget
 from PySide6.QtWidgets import (
   QApplication,
   QMainWindow,
@@ -26,6 +26,7 @@ class MainWindow(QMainWindow):
     self._createActions() 
     self._createMenuBar()
     self._createStatusBar()
+    self._createTabs()
 
   def _createActions(self):
     """Define menu actions for the application."""
@@ -89,6 +90,16 @@ class MainWindow(QMainWindow):
 
   def _createStatusBar(self):
     self.statusbar = self.statusBar()
+    
+  def _createTabs(self):
+    self.tabs = self.QtTabWidget()
+    self.tabs.addTab(nodemap, "Node &Map")
+    messages = # QtWidget type goes here
+    
+    nodes = # QtWidget type goes here
+    
+    nodemap = QtWebEngineView()
+    nodemap.setUrl((QUrl("./map.html"))
 
 def setupSerialInterface():
   if platform.system() == 'Windows':
