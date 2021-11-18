@@ -5,13 +5,15 @@
 # Python GUI client for use with Meshtastic project hardware
 
 import meshtastic, platform, sys
-from PySide6.QtCore import Qt, Slot
-from PySide6.QtGui import QAction, QIcon, QKeySequence, QTabWidget
+from PySide6.QtCore import Qt, Slot, QUrl
+from PySide6.QtGui import QAction, QIcon, QKeySequence
+from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (
   QApplication,
   QMainWindow,
   QMenu,
   QMenuBar,
+  QTabWidget,
   QWidget
 )
 
@@ -92,14 +94,15 @@ class MainWindow(QMainWindow):
     self.statusbar = self.statusBar()
     
   def _createTabs(self):
-    self.tabs = self.QtTabWidget()
-    self.tabs.addTab(nodemap, "Node &Map")
-    messages = # QtWidget type goes here
+    self.tabs = QTabWidget()
     
-    nodes = # QtWidget type goes here
+    mapUrl = "./maps.html"
+    self.nodemap = QWebEngineView()
+    self.nodemap.setUrl(mapUrl)
+    self.tabs.addTab(self.nodemap, "Node Map")
     
-    nodemap = QtWebEngineView()
-    nodemap.setUrl((QUrl("./map.html"))
+    # messages = # QtWidget type goes here
+    # nodes = # QtWidget type goes here
 
 def setupSerialInterface():
   if platform.system() == 'Windows':
