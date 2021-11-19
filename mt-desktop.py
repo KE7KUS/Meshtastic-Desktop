@@ -6,78 +6,110 @@
 
 import meshtastic, platform, sys
 from PySide6.QtCore import Qt, Slot, QUrl
-from PySide6.QtGui import QAction, QIcon, QKeySequence, QTextEdit
+from PySide6.QtGui import QAction, QIcon, QKeySequence
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (
   QApplication,
   QMainWindow,
   QMenu,
   QMenuBar,
+  QPushButton,
+  QStatusBar,
   QTabWidget,
+  QTextEdit,
+  QVBoxLayout,
   QWidget
 )
 
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.  You should have received a copy of the GNU General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-class MainWindow(QMainWindow):
+class App(QMainWindow):
   """Defines the GUI interface for the application."""
-  def __init__(self, parent = None):
+
+  def __init__(self):
     """Class instantiation.  Inherits attributes from QMainWindow."""
     super().__init__()
-    self.setWindowTitle("Meshtastic Desktop")
-    self._createActions() 
+
+    self.title = "Meshtastic Desktop"
+    self.left = 50
+    self.top = 50
+    self.width = 600
+    self.height = 400
+    
+    self.setWindowTitle(self.title)
+    self.setGeometry(self.left, self.top, self.width, self.height)
+
+    self._createActions()
     self._createMenuBar()
     self._createStatusBar()
-    self._createTabs()
+
+    self.tab_widget = TabWidget(self)
+    self.setCentralWidget(self.tab_widget)
+
+    self.show()
 
   def _createActions(self):
     """Define menu actions for the application."""
-    edit = QTextEdit(self)
-    
+
+    # -----FILE MENU----- #
+
+    # Clear the current radio configuration and set the radio to wait for new configuration to be loaded
     self.newAction = QAction(QIcon("./icons/document.png"), "&New", self)
     self.newAction.setShortcut(QKeySequence.New)
 
+    # Open an existing radio configuration file
     self.openAction = QAction(QIcon("./icons/blue-folder-open-document-text.png"), "&Open...", self)
     self.openAction.setShortcut(QKeySequence.Open)
 
+    # Save the current configuration to the current save file - if no save file exists, open the Save As dialog
     self.saveAction = QAction(QIcon("./icons/disk.png"), "&Save", self)
     self.saveAction.setShortcut(QKeySequence.Save)
 
+    # Save the current configuration to a new file - opens a Save As dialog
     self.saveAsAction = QAction(QIcon("./icons/disks.png"), "Save As...", self)
     self.saveAsAction.setShortcut(QKeySequence.SaveAs)
-
+   
+    # Exit the application
     self.exitAction = QAction(QIcon("./icons/cross.png"), "&Quit", self)
     self.exitAction.setShortcut(QKeySequence.Quit)
-    self.exitAction.triggered.connect(QtGui.qApp.quit)
+    self.exitAction.triggered.connect(QApplication.quit)
 
+    # -----EDIT MENU----- #
+
+    # Cut selected text
     self.cutAction = QAction(QIcon("./icons/scissors.png"), "C&ut", self)
     self.cutAction.setShortcut(QKeySequence.Cut)
-    self.cutAction.triggered.connect(edit.cut)
 
+    # Copy selected text
     self.copyAction = QAction(QIcon("./icons/blue-document-copy.png"), "&Copy", self)
     self.copyAction.setShortcut(QKeySequence.Copy)
-    self.copyAction.triggered.connect(edit.copy)
 
+    # Paste cut/copied text
     self.pasteAction = QAction(QIcon("./icons/application--plus.png"), "&Paste", self)
     self.pasteAction.setShortcut(QKeySequence.Paste)
-    self.pasteAction.triggered.connect(edit.paste)
 
     self.radioConfigAction = QAction(QIcon("./icons/wrench.png"), "&Radio Configuration...", self)
 
+    # -----HELP MENU----- #
+
+    # Open Help dialog
     self.helpContentAction = QAction(QIcon("./icons/lifebuoy.png"), "&Help...", self)
     self.helpContentAction.setShortcut(QKeySequence.HelpContents)
 
+    # Open About dialog
     self.aboutAction = QAction(QIcon("./icons/question.png"), "&About...", self)
 
-  # -----GUI Methods-----#
-
   def _createMenuBar(self):
-    """Constructs the application main menu bar."""
+    """Constructs the application's main menu bar."""
     menuBar = self.menuBar()
 
-    # File Menu
-    fileMenu = QMenu("&File", self)
-    menuBar.addMenu(fileMenu)
+    # FILE menu setup
+
+    # fileMenu = QMenu("&File", self)
+    # menuBar.addMenu(fileMenu)
+
+    fileMenu = menuBar.addMenu("&File")
+
     fileMenu.addAction(self.newAction)
     fileMenu.addAction(self.openAction)
     fileMenu.addAction(self.saveAction)
@@ -85,40 +117,67 @@ class MainWindow(QMainWindow):
     fileMenu.addSeparator()
     fileMenu.addAction(self.exitAction)
 
-    # Edit Menu
+    # EDIT menu setup
+
     editMenu = menuBar.addMenu("&Edit")
+
     editMenu.addAction(self.cutAction)
     editMenu.addAction(self.copyAction)
     editMenu.addAction(self.pasteAction)
     editMenu.addSeparator()
     editMenu.addAction(self.radioConfigAction)
 
-    # Help Menu
+    # HELP menu setup
+
     helpMenu = menuBar.addMenu("&Help")
+
     helpMenu.addAction(self.helpContentAction)
     helpMenu.addAction(self.aboutAction)
 
   def _createStatusBar(self):
-    self.statusbar = self.statusBar()
-    
-  def _createTabs(self):
+    """Constructs the application's status bar at the bottom of the main window."""
+    self.statusbar = self.statusBar() 
+    self.statusbar.showMessage("Ready", 30)   
+
+class TabWidget(QWidget):
+  """Controls and interface with the QTabWidget."""
+
+  def __init__(self, parent):
+    """Class instantiation.  Inherits attributes from QWidget."""
+    super().__init__(parent)
+    self.layout = QVBoxLayout(self)
+
     self.tabs = QTabWidget()
-    
-    mapUrl = "./maps.html"
-    self.nodemap = QWebEngineView()
-    self.nodemap.setUrl(mapUrl)
-    self.tabs.addTab(self.nodemap, "Node Map")
-    
-    # messages = # QtWidget type goes here
-    # nodes = # QtWidget type goes here
+    self.message = QWidget()
+    self.filexfr = QWidget()
+    self.nodelist = QWidget()
+    self.nodemap = QWidget()
+    self.tabs.resize(600,400)
+
+    self.tabs.addTab(self.message, "&Messages")
+    self.tabs.addTab(self.filexfr, "&File Transfer")
+    self.tabs.addTab(self.nodelist, "Node &List")
+    self.tabs.addTab(self.nodemap, "Node Ma&p")
+
+    self.message.layout = QVBoxLayout(self)
+    self.sendButton = QPushButton("Send Message")
+    self.message.layout.addWidget(self.sendButton)
+    self.message.setLayout(self.message.layout)
+
+    self.layout.addWidget(self.tabs)
+    self.setLayout(self.layout)
+
+  @Slot()
+  def on_click(self):
+    self.statusbar.showMessage("Sending message...", 30)
 
 def setupSerialInterface():
-  if platform.system() == 'Windows':
-    # TODO: Read Windows USB device list, identify COM port associated with Meshtastic VendorID/ProductID, update devPath accordingly
-    i = meshtastic.SerialInterface(devPath='COM3')
-  elif platform.system() == 'Linux':
-    i = mesthastic.SerialInterface()
-  elif platform.system == 'macOS':
+  if platform.system() == "Windows":
+    # TODO:  Read Windows USB device list, identify COM port associated with MT VID/PID, update devPath
+    i = meshtastic.SerialInterface(devPath="COM3")
+  elif platform.system() == "Linux":
+    i = meshtastic.SerialInterface()
+  elif plaform.system() == "macOS":
     i = meshtastic.SerialInterface()
   else:
     print(f'Platform system type requires manual SerialInterface configuration.')
@@ -126,15 +185,9 @@ def setupSerialInterface():
     i = meshtastic.SerialInterface()
   return i
 
-# TODO:  Built QtWidget UI with multi-tab interface
-#        - Text Messages:  send/receive, timestamp, message delete options, archive, multi-channel (up to 8) texts
-#        - Data:  2-way file transfer, image compression/resizing
-#        - Node List:  Display heard nodes table  
-#        - Node Map (using Folium):  Display interactive map of heard stations (Folium outputs HTML page)
-#        - Node Configuration:  Bandwidth/waveform, encryption key management, QR code display
-
-if __name__ == "__main__":
+if __name__ == '__main__':
   app = QApplication(sys.argv)
-  window = MainWindow()
-  window.show()
-  app.exec()
+  ex = App()
+  sys.exit(app.exec())
+    
+ 
