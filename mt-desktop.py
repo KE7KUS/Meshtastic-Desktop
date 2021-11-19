@@ -10,6 +10,7 @@ from PySide6.QtGui import QAction, QIcon, QKeySequence
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (
   QApplication,
+  QLineEdit,
   QMainWindow,
   QMenu,
   QMenuBar,
@@ -159,17 +160,41 @@ class TabWidget(QWidget):
     self.tabs.addTab(self.nodelist, "Node &List")
     self.tabs.addTab(self.nodemap, "Node Ma&p")
 
+    # TODO: Change layout to QGridLayout
     self.message.layout = QVBoxLayout(self)
+    
+    # TODO: Create multi-line text display box w/ scrolling to display message history.
+    #       QTextEdit vs. QListView (https://forum.pythonguis.com/t/cloud-around-the-text-in-qtextedit/318)
+    # TODO: Alternate justification - incoming messages left, outgoing messages right.
+    # TODO: Bubbles or color differentiation between incoming and outgoing messages.
+    # TODO: Create message delete function.
+    # TODO: Separate tabs for each possible message channel vs. color differentiate channel w/ Send channel pull-down selector
+    
+    # TODO:  Once QGridLayout complete, move Send button to right of QLineEdit
+    self.txtInput = QLineEdit(self)
     self.sendButton = QPushButton("Send Message")
+    self.message.layout.addWidget(self.txtInput)
     self.message.layout.addWidget(self.sendButton)
     self.message.setLayout(self.message.layout)
 
     self.layout.addWidget(self.tabs)
     self.setLayout(self.layout)
+    
+    # TODO:  Node list use TableLayout function vs. indigenous mt-python text table layout?
+    
+class configDialog(QWidget):
+  """User interface to control radio configuration."""
+  def super().__init__():
+    """Class instantiation.  Inherits attributes from QWidget."""
+  # TODO:  Message - Setting for displayed message history age
+  # TODO:  Message - Channel configuration for up to 8 different channels
+  # TODO:  Message - Channel-specific configuration for background color, font, size, etc.
+  # TODO:  Message - Save file location input (save file should save encrypted messages only)
 
   @Slot()
   def on_click(self):
     self.statusbar.showMessage("Sending message...", 30)
+# TODO:  Add SystemTray functionality - alert on incoming messages (special emergency alert?), minimize app to system tray
 
 def setupSerialInterface():
   if platform.system() == "Windows":
