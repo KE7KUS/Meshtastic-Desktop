@@ -4,13 +4,16 @@
 # by Kurt Kochendarfer, KE7KUS
 # Python GUI client for use with Meshtastic project hardware
 
-import meshtastic, platform, sys
+import meshtastic, platform, sys, os
 from PySide6.QtCore import Qt, Slot, QUrl
 from PySide6.QtGui import QAction, QIcon, QKeySequence
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (
   QApplication,
+  QGridLayout,
   QLineEdit,
+  QListView,
+  QListWidget,
   QMainWindow,
   QMenu,
   QMenuBar,
@@ -121,7 +124,6 @@ class App(QMainWindow):
     # EDIT menu setup
 
     editMenu = menuBar.addMenu("&Edit")
-
     editMenu.addAction(self.cutAction)
     editMenu.addAction(self.copyAction)
     editMenu.addAction(self.pasteAction)
@@ -141,7 +143,7 @@ class App(QMainWindow):
     self.statusbar.showMessage("Ready", 30)   
 
 class TabWidget(QWidget):
-  """Controls and interface with the QTabWidget."""
+  """Controls and interfaces with the QTabWidget."""
 
   def __init__(self, parent):
     """Class instantiation.  Inherits attributes from QWidget."""
@@ -160,31 +162,68 @@ class TabWidget(QWidget):
     self.tabs.addTab(self.nodelist, "Node &List")
     self.tabs.addTab(self.nodemap, "Node Ma&p")
 
-    # TODO: Change layout to QGridLayout
-    self.message.layout = QVBoxLayout(self)
-    
-    # TODO: Create multi-line text display box w/ scrolling to display message history.
-    #       QTextEdit vs. QListView (https://forum.pythonguis.com/t/cloud-around-the-text-in-qtextedit/318)
+    # ---Messages Tab--- #
+    self.message.layout = QGridLayout()
+    self.message.layout.setHorizontalSpacing(10)
+    self.message.layout.setVerticalSpacing(10)
+    self.textWindow = QListView(self)
+    self.txtInput = QLineEdit(self)
+    self.sendButton = QPushButton("Send Message")
+    self.message.layout.addWidget(self.textWindow, 1, 1, 3, 4)
+    self.message.layout.addWidget(self.txtInput, 4, 1, 1, 3)
+    self.message.layout.addWidget(self.sendButton, 4, 4, 1, 1)     
+
+    # QListView (https://forum.pythonguis.com/t/cloud-around-the-text-in-qtextedit/318)
     # TODO: Alternate justification - incoming messages left, outgoing messages right.
     # TODO: Bubbles or color differentiation between incoming and outgoing messages.
     # TODO: Create message delete function.
     # TODO: Separate tabs for each possible message channel vs. color differentiate channel w/ Send channel pull-down selector
-    
-    # TODO:  Once QGridLayout complete, move Send button to right of QLineEdit
-    self.txtInput = QLineEdit(self)
-    self.sendButton = QPushButton("Send Message")
-    self.message.layout.addWidget(self.txtInput)
-    self.message.layout.addWidget(self.sendButton)
+
     self.message.setLayout(self.message.layout)
 
-    self.layout.addWidget(self.tabs)
-    self.setLayout(self.layout)
-    
+    # ---File Transfer Tab--- #
+    self.filexfr.layout = QGridLayout()
+    self.filexfr.layout.setHorizontalSpacing(10)
+    self.filexfr.layout.setVerticalSpacing(10)
+    self.fileXfrList = QListWidget(self)
+    self.fileXfrRcvr = QListWidget(self)
+    self.fileXfrBtn = QPushButton(QIcon("./icons/arrow-000-medium.png"), "File Transfer", self)
+
+    self.filexfr.layout.addWidget(self.fileXfrList, 1, 1, 3, 2)
+    self.filexfr.layout.addWidget(self.fileXfrBtn, 2, 4, 1, 1)
+    self.filexfr.layout.addWidget(self.fileXfrRcvr, 1, 5, 3, 2)
+    # TODO:  List of CWD files (with change directory functions...up, back, etc.)
+    # TODO:  Ability to transfer multiple files by selecting (multi-select)
+    # TODO:  File transfer size checker / time estimator for sanity check
+    # TODO:  "Transfer File" button with right arrow icon
+    # TODO:  List of available nodes to transfer file to
+    # TODO:  Error dialog if no file/node selected
+    # TODO:  One-to-many file transfer
+    # TODO:  Right-click menu functionality for file transfer
+    # TODO:  File transfer progress bar in status bar at bottom of window
+    # TODO:  Frame with inset label on both ListWidgets
+    self.filexfr.setLayout(self.filexfr.layout)
+
+    # ---Node List Tab--- #
+    self.nodelist.layout = QGridLayout()
+    self.nodelist.layout.setHorizontalSpacing(10)
+    self.nodelist.layout.setVerticalSpacing(10)
+    self.nodes = QListWidget(self)
+    self.nodelist.layout.addWidget(self.nodes, 1, 1, 5, 5)    
     # TODO:  Node list use TableLayout function vs. indigenous mt-python text table layout?
-    
+    self.nodelist.setLayout(self.nodelist.layout)
+
+    # ---Node Map Tab--- #
+    self.nodemap.layout = QWebEngineView()
+
+    # ---Set Tab Layout--- #
+    self.layout.addWidget(self.tabs)
+    self.filexfr.setLayout(self.layout)    
+
 class configDialog(QWidget):
   """User interface to control radio configuration."""
-  def super().__init__():
+  def __init__(self):
+    super().__init__()
     """Class instantiation.  Inherits attributes from QWidget."""
   # TODO:  Message - Setting for displayed message history age
   # TODO:  Message - Channel configuration for up to 8 different channels
