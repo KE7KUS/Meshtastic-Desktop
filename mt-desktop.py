@@ -4,7 +4,7 @@
 # by Kurt Kochendarfer, KE7KUS
 # Python GUI client for use with Meshtastic project hardware
 
-import meshtastic, platform, sys, os
+import meshtastic, platform, sys, os, folium
 from PySide6.QtCore import Qt, Slot, QUrl
 from PySide6.QtGui import QAction, QIcon, QKeySequence
 from PySide6.QtWebEngineWidgets import QWebEngineView
@@ -214,11 +214,12 @@ class TabWidget(QWidget):
     self.nodelist.setLayout(self.nodelist.layout)
 
     # ---Node Map Tab--- #
-    self.nodemap.layout = QWebEngineView()
+    mappage = QWebEngineView()
+    mappage.setUrl(QUrl.fromLocalFile("test.html"))
+    mappage.show()
 
     # ---Set Tab Layout--- #
-    self.layout.addWidget(self.tabs)
-    self.filexfr.setLayout(self.layout)    
+    self.layout.addWidget(self.tabs)    
 
 class configDialog(QWidget):
   """User interface to control radio configuration."""
