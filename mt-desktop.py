@@ -60,48 +60,59 @@ class App(QMainWindow):
     # Clear the current radio configuration and set the radio to wait for new configuration to be loaded
     self.newAction = QAction(QIcon("./icons/document.png"), "&New", self)
     self.newAction.setShortcut(QKeySequence.New)
+    self.newAction.setStatusTip("Create a new Meshtastic node configuration file")
 
     # Open an existing radio configuration file
     self.openAction = QAction(QIcon("./icons/blue-folder-open-document-text.png"), "&Open...", self)
     self.openAction.setShortcut(QKeySequence.Open)
+    self.openAction.setStatusTip("Open an existing Meshtastic node configuration file...")    
 
     # Save the current configuration to the current save file - if no save file exists, open the Save As dialog
     self.saveAction = QAction(QIcon("./icons/disk.png"), "&Save", self)
     self.saveAction.setShortcut(QKeySequence.Save)
+    self.saveAction.setStatusTip("Save the configuration to the current Save file")
 
     # Save the current configuration to a new file - opens a Save As dialog
     self.saveAsAction = QAction(QIcon("./icons/disks.png"), "Save As...", self)
     self.saveAsAction.setShortcut(QKeySequence.SaveAs)
+    self.saveAsAction.setStatusTip("Save the configuration to a new file...")
    
     # Exit the application
     self.exitAction = QAction(QIcon("./icons/cross.png"), "&Quit", self)
     self.exitAction.setShortcut(QKeySequence.Quit)
     self.exitAction.triggered.connect(QApplication.quit)
+    self.exitAction.setStatusTip("Exit the program")
 
     # -----EDIT MENU----- #
 
     # Cut selected text
     self.cutAction = QAction(QIcon("./icons/scissors.png"), "C&ut", self)
     self.cutAction.setShortcut(QKeySequence.Cut)
+    self.cutAction.setStatusTip("Cut the selected text to the clipboard")
 
     # Copy selected text
     self.copyAction = QAction(QIcon("./icons/blue-document-copy.png"), "&Copy", self)
     self.copyAction.setShortcut(QKeySequence.Copy)
+    self.copyAction.setStatusTip("Copy the selected text to the clipboard")
 
     # Paste cut/copied text
     self.pasteAction = QAction(QIcon("./icons/application--plus.png"), "&Paste", self)
     self.pasteAction.setShortcut(QKeySequence.Paste)
+    self.pasteAction.setStatusTip("Paste the contents of the clipboard")
 
     self.radioConfigAction = QAction(QIcon("./icons/wrench.png"), "&Radio Configuration...", self)
+    self.radioConfigAction.setStatusTip("Change configuration settings for the connected Meshtastic radio...")
 
     # -----HELP MENU----- #
 
     # Open Help dialog
     self.helpContentAction = QAction(QIcon("./icons/lifebuoy.png"), "&Help...", self)
     self.helpContentAction.setShortcut(QKeySequence.HelpContents)
+    self.helpContentAction.setStatusTip("Open the internal help file...")
 
     # Open About dialog
     self.aboutAction = QAction(QIcon("./icons/question.png"), "&About...", self)
+    self.aboutAction.setStatusTip("Get information about the Meshtastic-Desktop program...")
 
   def _createMenuBar(self):
     """Constructs the application's main menu bar."""
@@ -139,7 +150,8 @@ class App(QMainWindow):
 
   def _createStatusBar(self):
     """Constructs the application's status bar at the bottom of the main window."""
-    self.statusbar = self.statusBar() 
+    self.statusbar = QStatusBar()
+    self.setStatusBar(self.statusbar) 
     self.statusbar.showMessage("Ready", 30)   
 
 class TabWidget(QWidget):
@@ -214,9 +226,8 @@ class TabWidget(QWidget):
     self.nodelist.setLayout(self.nodelist.layout)
 
     # ---Node Map Tab--- #
-    mappage = QWebEngineView()
-    mappage.setUrl(QUrl.fromLocalFile("test.html"))
-    mappage.show()
+    map_page = QWebEngineView()
+    map_page.setUrl(QUrl.fromLocalFile("map.html"))
 
     # ---Set Tab Layout--- #
     self.layout.addWidget(self.tabs)    
