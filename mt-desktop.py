@@ -37,8 +37,8 @@ class App(QMainWindow):
     self.title = "Meshtastic Desktop"
     self.left = 50
     self.top = 50
-    self.width = 600
-    self.height = 400
+    self.width = 800
+    self.height = 600
     
     self.setWindowTitle(self.title)
     self.setGeometry(self.left, self.top, self.width, self.height)
@@ -167,7 +167,7 @@ class TabWidget(QWidget):
     self.filexfr = QWidget()
     self.nodelist = QWidget()
     self.nodemap = QWidget()
-    self.tabs.resize(600,400)
+    self.tabs.resize(800,600)
 
     self.tabs.addTab(self.message, "&Messages")
     self.tabs.addTab(self.filexfr, "&File Transfer")
@@ -230,7 +230,12 @@ class TabWidget(QWidget):
     map_page.setUrl(QUrl.fromLocalFile("map.html"))
 
     # ---Set Tab Layout--- #
-    self.layout.addWidget(self.tabs)    
+    self.layout.addWidget(self.tabs)
+
+    # ---Tab Actions--- #
+  def sendMsg(self, msgtxt):
+    """Send a text message to another user."""
+        
 
 class configDialog(QWidget):
   """User interface to control radio configuration."""
@@ -247,23 +252,36 @@ class configDialog(QWidget):
     self.statusbar.showMessage("Sending message...", 30)
 # TODO:  Add SystemTray functionality - alert on incoming messages (special emergency alert?), minimize app to system tray
 
-def setupSerialInterface():
-  if platform.system() == "Windows":
-    # TODO:  Read Windows USB device list, identify COM port associated with MT VID/PID, update devPath
-    i = meshtastic.SerialInterface(devPath="COM3")
-  elif platform.system() == "Linux":
-    i = meshtastic.SerialInterface()
-  elif plaform.system() == "macOS":
-    i = meshtastic.SerialInterface()
-  else:
-    print(f'Platform system type requires manual SerialInterface configuration.')
-    # EDIT THE LINE BELOW TO POINT YOUR OS TO THE CORRECT devPath FOR YOUR MESHTASTIC HARDWARE
-    i = meshtastic.SerialInterface()
-  return i
+class Meshtastic():
+  """Class instantiation."""
+
+  def setupSerialInterface():
+    """Configures the hardware device serial interface."""
+    if platform.system() == "Windows":
+      # TODO:  Read Windows USB device list, identify COM port associated with MT VID/PID, update devPath
+      self.i = meshtastic.SerialInterface(devPath="COM3")
+      print(f'Found WindowsOS.  Meshtastic serial interface set.')
+    elif platform.system() == "Linux":
+      self.i = meshtastic.SerialInterface()
+      print(f'Found LinuxOS.  Meshtastic serial interface set.')
+    elif plaform.system() == "macOS":
+      self.i = meshtastic.SerialInterface()
+      print(f'Found macOS. Meshtastic serial interface set.')
+    else:
+      print(f'Platform system type requires manual SerialInterface configuration.')
+      # EDIT THE LINE BELOW TO POINT YOUR OS TO THE CORRECT devPath FOR YOUR MESHTASTIC HARDWARE
+      self.i = meshtastic.SerialInterface()
+    return self.i
+
+    def sendText(msgtxt):
+      """Send a plain text message."""
+      self.i.sendText(msgtxt)
+      self.i.close()   
 
 if __name__ == '__main__':
   app = QApplication(sys.argv)
   ex = App()
+  m = Meshtastic()
   sys.exit(app.exec())
     
  
