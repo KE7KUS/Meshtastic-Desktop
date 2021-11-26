@@ -10,7 +10,9 @@ from PySide6.QtGui import QAction, QIcon, QKeySequence
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (
   QApplication,
+  QComboBox,
   QGridLayout,
+  QLabel,
   QLineEdit,
   QListView,
   QListWidget,
@@ -37,7 +39,7 @@ class App(QMainWindow):
     self.title = "Meshtastic Desktop"
     self.left = 50
     self.top = 50
-    self.width = 800
+    self.width = 600
     self.height = 600
     
     self.setWindowTitle(self.title)
@@ -167,7 +169,7 @@ class TabWidget(QWidget):
     self.filexfr = QWidget()
     self.nodelist = QWidget()
     self.nodemap = QWidget()
-    self.tabs.resize(800,600)
+    self.tabs.resize(600,600)
 
     self.tabs.addTab(self.message, "&Messages")
     self.tabs.addTab(self.filexfr, "&File Transfer")
@@ -178,18 +180,29 @@ class TabWidget(QWidget):
     self.message.layout = QGridLayout()
     self.message.layout.setHorizontalSpacing(10)
     self.message.layout.setVerticalSpacing(10)
-    self.textWindow = QListView(self)
-    self.txtInput = QLineEdit(self)
-    self.sendButton = QPushButton("Send Message")
-    self.message.layout.addWidget(self.textWindow, 1, 1, 3, 4)
-    self.message.layout.addWidget(self.txtInput, 4, 1, 1, 3)
-    self.message.layout.addWidget(self.sendButton, 4, 4, 1, 1)     
 
+    self.textWindow = QListView(self)
     # QListView (https://forum.pythonguis.com/t/cloud-around-the-text-in-qtextedit/318)
     # TODO: Alternate justification - incoming messages left, outgoing messages right.
     # TODO: Bubbles or color differentiation between incoming and outgoing messages.
     # TODO: Create message delete function.
-    # TODO: Separate tabs for each possible message channel vs. color differentiate channel w/ Send channel pull-down selector
+    # TODO: Color differentiate incoming messages by channel
+
+    self.txtInput = QLineEdit(self)
+
+    self.channelList = QComboBox()
+    self.channelList.isEditable = False
+    # TODO: Populate pulldown with list of channel names from Meshtastic device configuration
+    # TODO: On selection, use the appropriate PSK for the selected channel to encode the message
+    self.channelList.insertItems(0, "01234567") 
+
+    self.sendButton = QPushButton(QIcon("./icons/mail--arrow.png"), "Send Message", self)
+    # self.sendButton.clicked.connect()	#TODO:  Create sendText function here 
+
+    self.message.layout.addWidget(self.textWindow, 1, 1, 3, 12)
+    self.message.layout.addWidget(self.txtInput, 5, 1, 1, 9)
+    self.message.layout.addWidget(self.channelList, 5, 10, 1, 1) 
+    self.message.layout.addWidget(self.sendButton, 5, 11, 1, 2) 
 
     self.message.setLayout(self.message.layout)
 
@@ -207,7 +220,6 @@ class TabWidget(QWidget):
     # TODO:  List of CWD files (with change directory functions...up, back, etc.)
     # TODO:  Ability to transfer multiple files by selecting (multi-select)
     # TODO:  File transfer size checker / time estimator for sanity check
-    # TODO:  "Transfer File" button with right arrow icon
     # TODO:  List of available nodes to transfer file to
     # TODO:  Error dialog if no file/node selected
     # TODO:  One-to-many file transfer
@@ -226,17 +238,15 @@ class TabWidget(QWidget):
     self.nodelist.setLayout(self.nodelist.layout)
 
     # ---Node Map Tab--- #
-    map_page = QWebEngineView()
-    map_page.setUrl(QUrl.fromLocalFile("map.html"))
+    map_page = QWebEnginePage()
+    # map_page.load(QUrl.fromLocalFile("map.html"))
+    map_page.load(QUrl("https://www.duckduckgo.com"))
+    map_page.show()
+    # TODO:  Use loadStarted(), loadProgress(), and loadFinished() to build GUI progress bar in StatusBar
 
     # ---Set Tab Layout--- #
     self.layout.addWidget(self.tabs)
-
-    # ---Tab Actions--- #
-  def sendMsg(self, msgtxt):
-    """Send a text message to another user."""
-        
-
+       
 class configDialog(QWidget):
   """User interface to control radio configuration."""
   def __init__(self):
@@ -246,16 +256,12 @@ class configDialog(QWidget):
   # TODO:  Message - Channel configuration for up to 8 different channels
   # TODO:  Message - Channel-specific configuration for background color, font, size, etc.
   # TODO:  Message - Save file location input (save file should save encrypted messages only)
-
-  @Slot()
-  def on_click(self):
-    self.statusbar.showMessage("Sending message...", 30)
-# TODO:  Add SystemTray functionality - alert on incoming messages (special emergency alert?), minimize app to system tray
+  # TODO:  Add SystemTray functionality - alert on incoming messages (special emergency alert?), minimize app to system tray
 
 class Meshtastic():
   """Class instantiation."""
 
-  def setupSerialInterface():
+  def setupSerialInterface(self):
     """Configures the hardware device serial interface."""
     if platform.system() == "Windows":
       # TODO:  Read Windows USB device list, identify COM port associated with MT VID/PID, update devPath
@@ -273,15 +279,11 @@ class Meshtastic():
       self.i = meshtastic.SerialInterface()
     return self.i
 
-    def sendText(msgtxt):
-      """Send a plain text message."""
-      self.i.sendText(msgtxt)
-      self.i.close()   
-
 if __name__ == '__main__':
   app = QApplication(sys.argv)
   ex = App()
   m = Meshtastic()
+  # m.setupSerialInterface()
   sys.exit(app.exec())
     
  
