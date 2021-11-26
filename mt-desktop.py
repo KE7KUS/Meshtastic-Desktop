@@ -42,6 +42,7 @@ class App(QMainWindow):
     self.width = 600
     self.height = 600
     
+    self.setWindowIcon(QIcon("./icons/mt-logo-2.png"))
     self.setWindowTitle(self.title)
     self.setGeometry(self.left, self.top, self.width, self.height)
 
@@ -238,9 +239,9 @@ class TabWidget(QWidget):
     self.nodelist.setLayout(self.nodelist.layout)
 
     # ---Node Map Tab--- #
-    map_page = QWebEnginePage()
+    map_page = QWebEngineView()
     # map_page.load(QUrl.fromLocalFile("map.html"))
-    map_page.load(QUrl("https://www.duckduckgo.com"))
+    map_page.setUrl(QUrl("https://www.duckduckgo.com"))
     map_page.show()
     # TODO:  Use loadStarted(), loadProgress(), and loadFinished() to build GUI progress bar in StatusBar
 
