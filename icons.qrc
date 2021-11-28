@@ -1,0 +1,18 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource>
+        <file>icons/application--plus.png</file>
+        <file>icons/arrow-000-medium.png</file>
+        <file>icons/blue-document-copy.png</file>
+        <file>icons/blue-folder-open-document-text.png</file>
+        <file>icons/cross.png</file>
+        <file>icons/disk.png</file>
+        <file>icons/disks.png</file>
+        <file>icons/document.png</file>
+        <file>icons/lifebuoy.png</file>
+        <file>icons/mail--arrow.png</file>
+        <file>icons/mt-logo-2.png</file>
+        <file>icons/question.png</file>
+        <file>icons/scissors.png</file>
+        <file>icons/wrench.png</file>
+    </qresource>
+</RCC>
