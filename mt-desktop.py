@@ -9,8 +9,8 @@
 
 import meshtastic, platform, sys, os, folium, icons
 
-from PySide6.QtCore import Qt, QObject, Signal, Slot, QUrl
-from PySide6.QtGui import QAction, QIcon, QKeySequence
+from PySide6.QtCore import Qt, QAbstractListModel, QMargins, QObject, QPoint, QSize, QUrl, Signal, Slot
+from PySide6.QtGui import QAction, QColor, QFontMetrics, QIcon, QKeySequence
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (
     QApplication,
@@ -177,11 +177,16 @@ class TabWidget(QWidget):
         self.message.layout.setVerticalSpacing(10)
         
         self.txtWindow = QListView(self)
-        # TODO:  Listen for incoming messages and display in this ListView
+        # TODO:  Listen for incoming messages and display in this ListView (https://forum.pythonguis.com/t/cloud-around-the-text-in-qtextedit/318)
         # TODO:  Alternating justification (RX msgs - left justified / TX msgs - right justified)
         # TODO:  Color-differentiated bubbles for incoming text on each configured channel
+        self.bubbleColors = {SENT:"#797C85", CH0:"#37517C", CH1:"#E8D2AE", CH2:"#D7B29D", CH3:"#CB8589", CH4:"#796465", CH5:"#EB8658", CH6:"#222328", CH7:"#DDE8B9"} # Color palette created at https://coolors.co
+        self.bubblePadding = QMargins(15,5,15,5)
+        self.textPadding = QMargins(25,15,25,15)
         # TODO:  Display color-coding legend with configured channels below the txtInput line.
         # TODO:  Create message delete function (i.e. remove one item from ListView)
+        # TODO:  If hearing another node repeat a sent message, generate a "send successful" indicator
+        #        - If ACK received from destination node, generate a "message received" indicator
         
         self.txtInput = QLineEdit(self)
         self.txtInput.returnPressed.connect(lambda:self.sendText())
@@ -219,12 +224,9 @@ class TabWidget(QWidget):
     def sendText(self):
         """Send Meshtastic text message."""
         # TODO:  Send text message over Meshtastic SerialInterface
+        # TODO:  Investigate using MeshInterface.sendData due to being able to assign a channel number using that format
         print("Message sent: " + self.txtInput.text())
         self.txtInput.clear()
-    
-    def clrLine(self):
-        """Clear text input line."""
-        
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)
