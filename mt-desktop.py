@@ -155,11 +155,6 @@ class MainWindow(QMainWindow):
 
 class TabWidget(QWidget):
     """Controls and interfaces for the tabbed portion of the user interface."""
-    
-    @Slot()
-    def send_text(self, msgtxt):
-        """Send Meshtastic text message."""
-        print(f"Message sent: {msgtxt}")
 
     def __init__(self, parent):
         """Class instatiation.  Inherits attributes from QWidget."""
@@ -175,6 +170,7 @@ class TabWidget(QWidget):
         self.tabs.resize(600,600)
         
         #---MESSAGES TAB---#
+        
         self.tabs.addTab(self.message, "&Messages")
         self.message.layout = QGridLayout()
         self.message.layout.setHorizontalSpacing(10)
@@ -188,19 +184,19 @@ class TabWidget(QWidget):
         # TODO:  Create message delete function (i.e. remove one item from ListView)
         
         self.txtInput = QLineEdit(self)
-        # TODO:  Use entered text in txtInput window as text to be send when "Send Message" is clicked.
-        # TODO:  Clear field and update txtWindow with sent text on "Send Message" click.
+        self.txtInput.returnPressed.connect(lambda:self.sendText())
         
         self.chList = QComboBox(self)
         self.chList.isEditable = False
         self.chList.insertItems(0,"01234567")
         # TODO:  Change chList.insertItems to enumerate all configured channel names in human-readable format
         # TODO:  On selection of a channel in chList, utilize the correct PSK for that channel to send the text message
+        #        - Use currentTextChanged() function to trigger this method
+        #        - Text of the current item is returned with the currentText() call
         # TODO:  Make channel selection sticky...once it's selected, use that channel until changed by the user
         
         self.sendBtn = QPushButton(QIcon(":/icons/mail--arrow.png"), "Send Message", self)
-        #TODO:  On sendBtn click, send a Meshtastic text message
-        self.sendBtn.clicked.connect(self.send_text("Hello World."))
+        self.sendBtn.clicked.connect(lambda:self.sendText())
         
         self.message.layout.addWidget(self.txtWindow, 1, 1, 3, 12)
         self.message.layout.addWidget(self.txtInput, 5, 1, 1, 9)
@@ -211,10 +207,24 @@ class TabWidget(QWidget):
         
         #---FILE TRANSFER TAB---#        
         self.tabs.addTab(self.filexfr, "&File Transfer")
+        
+        #---NODE LIST TAB---#
         self.tabs.addTab(self.nodelist, "Node &List")
+        
+        #---NODE MAP TAB---#
         self.tabs.addTab(self.nodemap, "Node Ma&p")
         
         self.layout.addWidget(self.tabs)
+    
+    def sendText(self):
+        """Send Meshtastic text message."""
+        # TODO:  Send text message over Meshtastic SerialInterface
+        print("Message sent: " + self.txtInput.text())
+        self.txtInput.clear()
+    
+    def clrLine(self):
+        """Clear text input line."""
+        
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)
